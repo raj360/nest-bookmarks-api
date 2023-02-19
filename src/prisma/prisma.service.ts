@@ -10,10 +10,10 @@ export class PrismaService extends PrismaClient {
           url: process.env.DATABASE_URL,
         },
       },
-
-      log: ['query', 'info', 'warn'],
-
-      errorFormat: 'pretty',
     });
+  }
+
+  cleanDB() {
+    this.$transaction([this.bookmark.deleteMany(), this.user.deleteMany()]);
   }
 }
