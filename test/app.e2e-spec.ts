@@ -208,6 +208,7 @@ describe('App', () => {
         title: 'Google',
         description: 'Thank you for visiting google',
       };
+
       it('should edit bookmarks', () => {
         return pactum
           .spec()
@@ -238,6 +239,17 @@ describe('App', () => {
             Authorization: 'Bearer $S{token}',
           })
           .expectStatus(204);
+      });
+
+      it('should get empty bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks')
+          .withHeaders({
+            Authorization: 'Bearer $S{token}',
+          })
+          .expectStatus(200)
+          .expectJsonLength(0);
       });
     });
   });
