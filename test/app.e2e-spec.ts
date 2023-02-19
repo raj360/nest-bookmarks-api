@@ -26,12 +26,12 @@ describe('App', () => {
     await app.close();
   });
 
-  describe('Auth', () => {
-    const dto: AuthDto = {
-      email: 'test@example.com',
-      password: 'test',
-    };
+  const dto: AuthDto = {
+    email: 'test@example.com',
+    password: 'test',
+  };
 
+  describe('Auth', () => {
     describe('Sign up', () => {
       it('should sign up', () => {
         return pactum
@@ -96,13 +96,24 @@ describe('App', () => {
           .spec()
           .post('/auth/signin')
           .withBody(dto)
-          .expectStatus(200);
+          .expectStatus(200)
+          .stores('token', 'access_token');
       });
     });
   });
 
   describe('User', () => {
-    describe('profile', () => {});
+    describe('profile', () => {
+      it('Get user', () => {
+        return pactum
+          .spec()
+          .get('/users/profile')
+          .withHeaders({
+            Authorization: 'Bearer $S{token}',
+          })
+          .expectStatus(200);
+      });
+    });
     describe('Edit user', () => {});
   });
 
