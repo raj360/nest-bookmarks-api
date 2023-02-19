@@ -32,6 +32,7 @@ model Bookmark {
 
   title String
   link  String
+  description String?
 
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)

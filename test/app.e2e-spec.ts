@@ -1,10 +1,11 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import * as pactum from 'pactum';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AppModule } from '../src/app.module';
-import * as pactum from 'pactum';
 import { AuthDto } from '../src/auth/dto/auth.dto';
 import { EditUserDto } from '../src/user/dto/edit-user.dto';
+import { CreateBookmarkDto } from '../src/bookmark/dto';
 
 describe('App', () => {
   let app: INestApplication;
@@ -138,5 +139,39 @@ describe('App', () => {
     });
   });
 
-  describe('Bookmarks', () => {});
+  describe('Bookmarks', () => {
+    describe('Get empty bookmarks', () => {
+      it('should get empty bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks')
+          .withHeaders({
+            Authorization: 'Bearer $S{token}',
+          })
+          .expectStatus(200)
+          .expectBodyContains('[]');
+      });
+    });
+
+    describe('Create bookmark', () => {
+      const dto: CreateBookmarkDto = {
+        link: 'https://www.google.com',
+        title: 'Google',
+        description: 'Thank you for visiting google',
+      };
+      it('should create bookmark', () => {
+        it('should get empty bookmarks', () => {
+          return pactum
+            .spec()
+            .post('/bookmarks')
+            .withHeaders({
+              Authorization: 'Bearer $S{token}',
+            })
+            .withBody(dto)
+            .expectStatus(200)
+            .inspect();
+        });
+      });
+    });
+  });
 });
