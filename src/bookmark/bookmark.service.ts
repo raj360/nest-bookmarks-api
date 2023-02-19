@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditBookmarkDto } from './dto';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
@@ -16,9 +16,10 @@ export class BookmarkService {
   }
 
   async getBookmarkById(userId: number, bookmarkId: number) {
-    return this.prismaService.bookmark.findUnique({
+    return this.prismaService.bookmark.findFirst({
       where: {
         id: bookmarkId,
+        userId,
       },
       include: {
         user: true,
@@ -33,7 +34,6 @@ export class BookmarkService {
         userId,
       },
     });
-    console.log({ bookmark });
     return bookmark;
   }
 
@@ -42,6 +42,22 @@ export class BookmarkService {
     bookmarkId: number,
     dto: EditBookmarkDto,
   ) {
+    const bookmark = await this.prismaService.bookmark.findUnique({
+      where: {
+        id: bookmarkId,
+      },
+    });
+
+    if (!bookmark) {
+      throw new ForbiddenException('Bookmark not found');
+    }
+
+    if (bookmark.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not authorized to edit this bookmark',
+      );
+    }
+
     return await this.prismaService.bookmark.update({
       where: {
         id: bookmarkId,
