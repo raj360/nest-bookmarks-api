@@ -68,5 +68,27 @@ export class BookmarkService {
     });
   }
 
-  async deleteBookmarkById(userId: number, bookmarkId: number) {}
+  async deleteBookmarkById(userId: number, bookmarkId: number) {
+    const bookmark = await this.prismaService.bookmark.findUnique({
+      where: {
+        id: bookmarkId,
+      },
+    });
+
+    if (!bookmark) {
+      throw new ForbiddenException('Bookmark not found');
+    }
+
+    if (bookmark.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not authorized to delete this bookmark',
+      );
+    }
+
+    return await this.prismaService.bookmark.delete({
+      where: {
+        id: bookmarkId,
+      },
+    });
+  }
 }
